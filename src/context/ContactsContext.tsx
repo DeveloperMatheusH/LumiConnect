@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Contact, Conversation, Message } from '@/types';
+import { Contact, Conversation, Message, Medication } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -40,6 +39,10 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       ...prev, 
       { contactId: newContact.id, messages: [] }
     ]);
+
+    // Add introduction message
+    const introMessage = 'Aqui você poderá descrever as principais características de cada pessoa, desde consultas recentes até medicamentos utilizados no dia a dia.';
+    addMessage(newContact.id, introMessage, false);
     
     toast({
       title: "Contato adicionado",

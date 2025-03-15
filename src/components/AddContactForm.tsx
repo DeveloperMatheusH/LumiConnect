@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useContacts } from '@/context/ContactsContext';
-import { Contact } from '@/types';
+import { Contact, Medication } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { X, Plus } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface AddContactFormProps {
   onSuccess?: () => void;
@@ -48,6 +49,18 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
   const [newDislike, setNewDislike] = useState('');
   const [dislikes, setDislikes] = useState(existingContact?.dislikes || []);
   
+  // Medication state
+  const [medications, setMedications] = useState<Medication[]>(existingContact?.medications || []);
+  const [newMedication, setNewMedication] = useState({
+    name: '',
+    dosage: '',
+    frequency: '',
+    effect: ''
+  });
+  const [newEffect, setNewEffect] = useState('');
+  const [effectsList, setEffectsList] = useState<string[]>([]);
+  const [editingMedicationIndex, setEditingMedicationIndex] = useState<number | null>(null);
+  
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const validateForm = () => {
@@ -77,6 +90,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       stereotypies,
       likes,
       dislikes,
+      medications,
       avatar
     };
     
@@ -118,11 +132,68 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
     setAvatar(avatarData);
   };
   
+  const handleAddEffect = () => {
+    if (!newEffect.trim()) return;
+    setEffectsList([...effectsList, newEffect.trim()]);
+    setNewEffect('');
+  };
+  
+  const handleRemoveEffect = (index: number) => {
+    setEffectsList(effectsList.filter((_, i) => i !== index));
+  };
+  
+  const handleAddMedication = () => {
+    if (!newMedication.name.trim() || !newMedication.dosage.trim() || !newMedication.frequency.trim()) {
+      return;
+    }
+    
+    const medicationToAdd: Medication = {
+      id: uuidv4(),
+      name: newMedication.name,
+      dosage: newMedication.dosage,
+      frequency: newMedication.frequency,
+      effects: [...effectsList]
+    };
+    
+    if (editingMedicationIndex !== null) {
+      const updatedMedications = [...medications];
+      updatedMedications[editingMedicationIndex] = medicationToAdd;
+      setMedications(updatedMedications);
+      setEditingMedicationIndex(null);
+    } else {
+      setMedications([...medications, medicationToAdd]);
+    }
+    
+    setNewMedication({
+      name: '',
+      dosage: '',
+      frequency: '',
+      effect: ''
+    });
+    setEffectsList([]);
+  };
+  
+  const handleEditMedication = (index: number) => {
+    const medication = medications[index];
+    setNewMedication({
+      name: medication.name,
+      dosage: medication.dosage,
+      frequency: medication.frequency,
+      effect: ''
+    });
+    setEffectsList([...medication.effects]);
+    setEditingMedicationIndex(index);
+  };
+  
+  const handleRemoveMedication = (index: number) => {
+    setMedications(medications.filter((_, i) => i !== index));
+  };
+  
   return (
     <div className={`mx-auto py-4 animate-fade-in ${isMobile ? 'w-full px-4' : 'max-w-2xl'}`}>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-medium">
-          {existingContact ? 'Editar Contato' : 'Adicionar Novo Contato'}
+          {existingContact ? 'Editar Contato' : 'Adicionar Nova Pessoa'}
         </h1>
         {onCancel && (
           <Button variant="outline" size="sm" onClick={onCancel}>
@@ -216,6 +287,149 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
             />
             {errors.cid && <p className="text-destructive text-xs">{errors.cid}</p>}
           </div>
+        </div>
+        
+        {/* Medications Section */}
+        <div className="space-y-4 pt-2 border-t">
+          <h2 className="text-lg font-medium">Medicamentos</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="medication-name">Nome do Medicamento</Label>
+              <Input
+                id="medication-name"
+                value={newMedication.name}
+                onChange={(e) => setNewMedication({...newMedication, name: e.target.value})}
+                placeholder="Nome do medicamento"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="medication-dosage">Dosagem</Label>
+              <Input
+                id="medication-dosage"
+                value={newMedication.dosage}
+                onChange={(e) => setNewMedication({...newMedication, dosage: e.target.value})}
+                placeholder="Ex: 100mg"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="medication-frequency">Frequência (intervalo em horas)</Label>
+            <Input
+              id="medication-frequency"
+              value={newMedication.frequency}
+              onChange={(e) => setNewMedication({...newMedication, frequency: e.target.value})}
+              placeholder="Ex: 8h em 8h"
+            />
+          </div>
+          
+          <div className="space-y-3">
+            <Label>Efeitos</Label>
+            <div className="flex">
+              <Input
+                value={newEffect}
+                onChange={(e) => setNewEffect(e.target.value)}
+                placeholder="Adicionar efeito"
+                className="rounded-r-none"
+              />
+              <Button 
+                type="button"
+                onClick={handleAddEffect}
+                className="rounded-l-none px-3"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {effectsList.map((effect, index) => (
+                <div 
+                  key={index} 
+                  className="bg-accent text-accent-foreground text-sm px-3 py-1 rounded-full flex items-center gap-1"
+                >
+                  <span>{effect}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveEffect(index)}
+                    className="h-4 w-4 rounded-full hover:bg-background/20 flex items-center justify-center"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+              {effectsList.length === 0 && (
+                <p className="text-sm text-muted-foreground">Nenhum efeito adicionado</p>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex justify-end">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={handleAddMedication}
+              className="mt-2"
+            >
+              {editingMedicationIndex !== null ? 'Atualizar Medicamento' : 'Adicionar Medicamento'}
+            </Button>
+          </div>
+          
+          {/* List of added medications */}
+          {medications.length > 0 && (
+            <div className="mt-4 space-y-3">
+              <h3 className="text-sm font-medium">Medicamentos Adicionados</h3>
+              <div className="space-y-2">
+                {medications.map((medication, index) => (
+                  <div key={medication.id} className="border rounded-md p-3 bg-accent/10">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-medium">{medication.name}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Dosagem: {medication.dosage} | Frequência: {medication.frequency}
+                        </p>
+                        {medication.effects.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-xs font-medium mb-1">Efeitos:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {medication.effects.map((effect, i) => (
+                                <span 
+                                  key={i} 
+                                  className="text-xs bg-accent/30 px-2 py-0.5 rounded-full"
+                                >
+                                  {effect}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleEditMedication(index)}
+                          className="h-8 px-2"
+                        >
+                          Editar
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleRemoveMedication(index)}
+                          className="text-destructive h-8 px-2"
+                        >
+                          Remover
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="space-y-3">

@@ -9,8 +9,17 @@ export interface Contact {
   stereotypies: string[];
   likes: string[];
   dislikes: string[];
+  medications?: Medication[];
   lastMessageTime?: Date;
   avatar?: string; // Base64 or URL of the avatar
+}
+
+export interface Medication {
+  id: string;
+  name: string;
+  dosage: string;
+  frequency: string; // Frequency in hours
+  effects: string[];
 }
 
 export interface Message {
