@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Contact } from '@/types';
@@ -32,7 +31,9 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
   const [name, setName] = useState(existingContact?.name || '');
   const [age, setAge] = useState(existingContact?.age.toString() || '');
   const [intellectualDisability, setIntellectualDisability] = useState(existingContact?.intellectualDisability || '');
-  const [assistanceLevel, setAssistanceLevel] = useState(existingContact?.assistanceLevel || 'medium');
+  const [assistanceLevel, setAssistanceLevel] = useState<'low' | 'medium' | 'high'>(
+    existingContact?.assistanceLevel || 'medium'
+  );
   const [cid, setCid] = useState(existingContact?.cid || '');
   
   const [newStereotypy, setNewStereotypy] = useState('');
@@ -103,6 +104,12 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
     setItems(items.filter((_, i) => i !== index));
   };
   
+  const handleAssistanceLevelChange = (value: string) => {
+    if (value === 'low' || value === 'medium' || value === 'high') {
+      setAssistanceLevel(value);
+    }
+  };
+  
   return (
     <div className="max-w-2xl mx-auto py-4 animate-fade-in">
       <div className="flex justify-between items-center mb-4">
@@ -164,7 +171,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
             <Label htmlFor="assistanceLevel">Nível de Auxílio</Label>
             <Select
               value={assistanceLevel}
-              onValueChange={setAssistanceLevel}
+              onValueChange={handleAssistanceLevelChange}
             >
               <SelectTrigger id="assistanceLevel">
                 <SelectValue placeholder="Selecione o nível" />
