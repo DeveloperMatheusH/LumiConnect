@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({ openAddContactForm }) => {
           </Button>
         )}
         <h1 className="text-xl font-medium">
-          {selectedContact ? selectedContact.name : "Contatos"}
+          {selectedContact ? selectedContact.name : "Pessoas"}
         </h1>
       </div>
       
@@ -42,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ openAddContactForm }) => {
         className="flex items-center gap-1 transition-all duration-300 hover:bg-primary/10"
       >
         <PlusCircle className="h-4 w-4 mr-1" />
-        Novo Contato
+        Adicionar Nova Pessoa
       </Button>
     </header>
   );
