@@ -1,12 +1,14 @@
 
 import React from 'react';
 import { useContacts } from '@/context/ContactsContext';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit, Info } from 'lucide-react';
 import { useState } from 'react';
 import AddContactForm from './AddContactForm';
+import AvatarUpload from './AvatarUpload';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -27,13 +29,15 @@ const ConversationView: React.FC = () => {
     getContactById, 
     getConversationByContactId,
     addMessage,
-    deleteContact
+    deleteContact,
+    updateAvatar
   } = useContacts();
   
   const [messageInput, setMessageInput] = useState('');
   const [showEditForm, setShowEditForm] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [showContactInfo, setShowContactInfo] = useState(false);
+  const isMobile = useIsMobile();
   
   const selectedContact = selectedContactId 
     ? getContactById(selectedContactId) 
@@ -63,6 +67,12 @@ const ConversationView: React.FC = () => {
     addMessage(selectedContactId, messageInput, true);
     setMessageInput('');
   };
+
+  const handleAvatarChange = (avatarData: string) => {
+    if (selectedContactId) {
+      updateAvatar(selectedContactId, avatarData);
+    }
+  };
   
   return (
     <div className="flex-1 flex flex-col h-full animate-fade-in relative">
@@ -81,12 +91,13 @@ const ConversationView: React.FC = () => {
           </div>
           
           <div className="flex flex-col items-center mb-6">
-            <Avatar className="h-20 w-20 mb-3 border border-border/40">
-              <AvatarFallback className="bg-primary/10 text-primary-foreground text-xl">
-                {selectedContact.name.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <h3 className="text-xl font-medium">{selectedContact.name}</h3>
+            <AvatarUpload 
+              name={selectedContact.name}
+              avatarUrl={selectedContact.avatar}
+              onAvatarChange={handleAvatarChange}
+              size="lg"
+            />
+            <h3 className="text-xl font-medium mt-3">{selectedContact.name}</h3>
             <p className="text-sm text-muted-foreground">{selectedContact.age} anos</p>
           </div>
           
@@ -171,11 +182,12 @@ const ConversationView: React.FC = () => {
       {/* Chat Header */}
       <div className="px-4 py-3 border-b border-border flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8 border border-border/40">
-            <AvatarFallback className="bg-primary/10 text-primary-foreground">
-              {selectedContact.name.substring(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <AvatarUpload
+            name={selectedContact.name}
+            avatarUrl={selectedContact.avatar}
+            onAvatarChange={handleAvatarChange}
+            size="sm"
+          />
           <div>
             <h2 className="font-medium text-sm">{selectedContact.name}</h2>
             <p className="text-xs text-muted-foreground">{selectedContact.age} anos • {selectedContact.intellectualDisability}</p>
@@ -263,7 +275,7 @@ const ConversationView: React.FC = () => {
       
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className={isMobile ? "w-[90%] max-w-md" : ""}>
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir contato?</AlertDialogTitle>
             <AlertDialogDescription>

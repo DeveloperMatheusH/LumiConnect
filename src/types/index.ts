@@ -10,7 +10,7 @@ export interface Contact {
   likes: string[];
   dislikes: string[];
   lastMessageTime?: Date;
-  avatar?: string;
+  avatar?: string; // Base64 or URL of the avatar
 }
 
 export interface Message {

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Contact } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Trash2, MessageSquare } from 'lucide-react';
 
@@ -18,6 +18,9 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onSelect, onDelete }
       <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10 border border-border/40">
+            {contact.avatar ? (
+              <AvatarImage src={contact.avatar} alt={contact.name} className="object-cover" />
+            ) : null}
             <AvatarFallback className="bg-primary/10 text-primary-foreground">
               {contact.name.substring(0, 2).toUpperCase()}
             </AvatarFallback>

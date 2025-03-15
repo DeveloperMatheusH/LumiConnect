@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Contact, Conversation, Message } from '@/types';
 import { toast } from '@/components/ui/use-toast';
@@ -16,6 +16,7 @@ interface ContactsContextType {
   addMessage: (contactId: string, content: string, isUser: boolean) => void;
   getContactById: (id: string) => Contact | undefined;
   getConversationByContactId: (contactId: string) => Conversation | undefined;
+  updateAvatar: (contactId: string, avatarData: string) => void;
 }
 
 const ContactsContext = createContext<ContactsContextType | undefined>(undefined);
@@ -56,6 +57,21 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
     toast({
       title: "Contato atualizado",
       description: "As informações do contato foram atualizadas."
+    });
+  };
+
+  const updateAvatar = (contactId: string, avatarData: string) => {
+    setContacts((prev) =>
+      prev.map((contact) =>
+        contact.id === contactId
+          ? { ...contact, avatar: avatarData }
+          : contact
+      )
+    );
+
+    toast({
+      title: "Foto atualizada",
+      description: "A foto do perfil foi atualizada com sucesso."
     });
   };
 
@@ -137,7 +153,8 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
         selectContact,
         addMessage,
         getContactById,
-        getConversationByContactId
+        getConversationByContactId,
+        updateAvatar
       }}
     >
       {children}

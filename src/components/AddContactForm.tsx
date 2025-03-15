@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Contact } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import AvatarUpload from './AvatarUpload';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Select,
   SelectContent,
@@ -13,7 +15,6 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { X, Plus } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 
 interface AddContactFormProps {
   onSuccess?: () => void;
@@ -27,6 +28,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
   existingContact 
 }) => {
   const { addContact, updateContact } = useContacts();
+  const isMobile = useIsMobile();
   
   const [name, setName] = useState(existingContact?.name || '');
   const [age, setAge] = useState(existingContact?.age.toString() || '');
@@ -35,6 +37,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
     existingContact?.assistanceLevel || 'medium'
   );
   const [cid, setCid] = useState(existingContact?.cid || '');
+  const [avatar, setAvatar] = useState(existingContact?.avatar || '');
   
   const [newStereotypy, setNewStereotypy] = useState('');
   const [stereotypies, setStereotypies] = useState(existingContact?.stereotypies || []);
@@ -73,7 +76,8 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       cid,
       stereotypies,
       likes,
-      dislikes
+      dislikes,
+      avatar
     };
     
     if (existingContact) {
@@ -109,9 +113,13 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       setAssistanceLevel(value);
     }
   };
+
+  const handleAvatarChange = (avatarData: string) => {
+    setAvatar(avatarData);
+  };
   
   return (
-    <div className="max-w-2xl mx-auto py-4 animate-fade-in">
+    <div className={`mx-auto py-4 animate-fade-in ${isMobile ? 'w-full px-4' : 'max-w-2xl'}`}>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-medium">
           {existingContact ? 'Editar Contato' : 'Adicionar Novo Contato'}
@@ -124,7 +132,20 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Avatar Section */}
+        <div className="flex flex-col items-center mb-4">
+          <AvatarUpload 
+            name={name || 'Contato'}
+            avatarUrl={avatar}
+            onAvatarChange={handleAvatarChange}
+            size="lg"
+          />
+          <p className="text-xs text-muted-foreground mt-2">
+            Toque para adicionar foto
+          </p>
+        </div>
+
+        <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4`}>
           <div className="space-y-2">
             <Label htmlFor="name">Nome</Label>
             <Input
