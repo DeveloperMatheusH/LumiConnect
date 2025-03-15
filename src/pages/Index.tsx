@@ -1,13 +1,42 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
+import React, { useState } from 'react';
+import { ContactsProvider, useContacts } from '@/context/ContactsContext';
+import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
+import ConversationView from '@/components/ConversationView';
+import AddContactForm from '@/components/AddContactForm';
+
+// Main application layout
+const AppLayout = () => {
+  const [showAddContactForm, setShowAddContactForm] = useState(false);
+  
+  return (
+    <div className="h-screen flex flex-col">
+      <Header openAddContactForm={() => setShowAddContactForm(true)} />
+      
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar />
+        <ConversationView />
+      </div>
+      
+      {showAddContactForm && (
+        <div className="absolute inset-0 bg-background/95 z-50 overflow-y-auto animate-fade-in p-4">
+          <AddContactForm
+            onSuccess={() => setShowAddContactForm(false)}
+            onCancel={() => setShowAddContactForm(false)}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Wrapper with context provider
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <ContactsProvider>
+      <AppLayout />
+    </ContactsProvider>
   );
 };
 
