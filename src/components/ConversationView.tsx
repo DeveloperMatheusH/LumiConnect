@@ -51,9 +51,9 @@ const ConversationView: React.FC = () => {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-4 animate-fade-in">
         <div className="max-w-md text-center space-y-4">
-          <h2 className="text-xl font-medium">Selecione um contato</h2>
+          <h2 className="text-xl font-medium">Selecione uma anotação do aluno(a)</h2>
           <p className="text-muted-foreground">
-            Selecione um contato da lista para visualizar ou iniciar uma conversa.
+            Selecione na lista para visualizar ou iniciar uma anotação na conversa.
           </p>
         </div>
       </div>
