@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Contact, Conversation, Message, Medication } from '@/types';
@@ -32,17 +33,46 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       lastMessageTime: new Date() 
     };
     
-    setContacts((prev) => [...prev, newContact]);
+    // Update contacts state with new contact
+    const updatedContacts = [...contacts, newContact];
+    setContacts(updatedContacts);
     
     // Initialize empty conversation for new contact
-    setConversations((prev) => [
-      ...prev, 
+    const updatedConversations = [
+      ...conversations, 
       { contactId: newContact.id, messages: [] }
-    ]);
+    ];
+    setConversations(updatedConversations);
 
     // Add introduction message
     const introMessage = 'Aqui você poderá descrever as principais características de cada pessoa, desde consultas recentes até medicamentos utilizados no dia a dia.';
-    addMessage(newContact.id, introMessage, false);
+    
+    // Add message directly to the updated conversations array
+    const newMessage: Message = {
+      id: uuidv4(),
+      contactId: newContact.id,
+      content: introMessage,
+      timestamp: new Date(),
+      isUser: false
+    };
+    
+    // Find the conversation we just added and update it with the intro message
+    const convoIndex = updatedConversations.findIndex(
+      (convo) => convo.contactId === newContact.id
+    );
+    
+    if (convoIndex >= 0) {
+      const finalConversations = [...updatedConversations];
+      finalConversations[convoIndex] = {
+        ...finalConversations[convoIndex],
+        messages: [...finalConversations[convoIndex].messages, newMessage]
+      };
+      
+      setConversations(finalConversations);
+    }
+    
+    // Select the newly created contact
+    setSelectedContactId(newContact.id);
     
     toast({
       title: "Contato adicionado",
