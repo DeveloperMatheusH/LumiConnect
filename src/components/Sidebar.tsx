@@ -2,14 +2,21 @@
 import React, { useMemo } from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  Sidebar as SidebarComponent,
+  SidebarContent,
+  SidebarHeader,
+  SidebarTrigger,
+  SidebarProvider,
+  useSidebar
+} from '@/components/ui/sidebar';
 
-const Sidebar: React.FC = () => {
+const SidebarContents = () => {
   const { contacts, selectContact, selectedContactId } = useContacts();
   const [searchQuery, setSearchQuery] = useState('');
   const isMobile = useIsMobile();
@@ -37,12 +44,9 @@ const Sidebar: React.FC = () => {
     );
   }, [sortedContacts, searchQuery]);
   
-  // If mobile and there's a selected contact, hide the sidebar
-  if (isMobile && selectedContactId) return null;
-  
   return (
-    <div className="w-full md:w-80 border-r border-border flex flex-col h-full animate-fade-in">
-      <div className="p-3 sticky top-0 z-10 bg-background/80 backdrop-blur-sm">
+    <>
+      <SidebarHeader>
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -52,9 +56,9 @@ const Sidebar: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-      </div>
+      </SidebarHeader>
       
-      <div className="flex-1 overflow-y-auto scrollbar-thin">
+      <SidebarContent className="p-0">
         {filteredContacts.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 text-muted-foreground text-sm p-4">
             <p>Nenhum contato encontrado</p>
@@ -68,7 +72,14 @@ const Sidebar: React.FC = () => {
                 className={`w-full justify-start p-3 h-auto gap-3 rounded-none hover-glass ${
                   selectedContactId === contact.id ? 'bg-accent/70 hover:bg-accent/70' : ''
                 }`}
-                onClick={() => selectContact(contact.id)}
+                onClick={() => {
+                  selectContact(contact.id);
+                  if (isMobile) {
+                    // Close sidebar on mobile after selecting a contact
+                    const { setOpen } = useSidebar();
+                    setOpen(false);
+                  }
+                }}
               >
                 <Avatar className="h-10 w-10 border border-border/40 flex-shrink-0">
                   <AvatarFallback className="bg-primary/10 text-primary-foreground">
@@ -85,8 +96,27 @@ const Sidebar: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </SidebarContent>
+    </>
+  );
+};
+
+const Sidebar = () => {
+  const { selectedContactId } = useContacts();
+  const isMobile = useIsMobile();
+  
+  // If mobile and there's a selected contact, hide the sidebar
+  if (isMobile && selectedContactId) return null;
+  
+  return (
+    <SidebarComponent 
+      className="border-r border-border"
+      // On mobile, we want the sidebar to be collapsed by default
+      variant="sidebar"
+      collapsible={isMobile ? "offcanvas" : "none"}
+    >
+      <SidebarContents />
+    </SidebarComponent>
   );
 };
 

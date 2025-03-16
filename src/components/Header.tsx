@@ -2,8 +2,9 @@
 import React from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 interface HeaderProps {
   openAddContactForm: () => void;
@@ -20,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ openAddContactForm }) => {
   return (
     <header className="h-16 border-b border-border backdrop-blur-sm bg-background/90 flex items-center justify-between px-4 sticky top-0 z-10">
       <div className="flex items-center gap-3 min-w-0 flex-1 max-w-[60%]">
-        {isMobile && selectedContactId && (
+        {isMobile && selectedContactId ? (
           <Button
             variant="ghost"
             size="icon"
@@ -29,7 +30,10 @@ const Header: React.FC<HeaderProps> = ({ openAddContactForm }) => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-        )}
+        ) : isMobile ? (
+          <SidebarTrigger className="mr-2" />
+        ) : null}
+        
         <h1 className="text-xl font-medium truncate">
           {selectedContact ? selectedContact.name : "Pessoas"}
         </h1>
