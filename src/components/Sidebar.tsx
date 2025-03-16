@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -69,13 +70,13 @@ const Sidebar: React.FC = () => {
                 }`}
                 onClick={() => selectContact(contact.id)}
               >
-                <Avatar className="h-10 w-10 border border-border/40">
+                <Avatar className="h-10 w-10 border border-border/40 flex-shrink-0">
                   <AvatarFallback className="bg-primary/10 text-primary-foreground">
                     {contact.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col items-start gap-0.5 overflow-hidden">
-                  <span className="font-medium text-sm">{contact.name}</span>
+                <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
+                  <span className="font-medium text-sm truncate w-full">{contact.name}</span>
                   <span className="text-xs text-muted-foreground truncate w-full">
                     {contact.intellectualDisability} • CID: {contact.cid}
                   </span>

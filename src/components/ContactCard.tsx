@@ -16,8 +16,8 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onSelect, onDelete }
   return (
     <Card className="glass-card overflow-hidden transition-all duration-300 hover:shadow-lg">
       <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 border border-border/40">
+        <div className="flex items-center gap-3 w-full overflow-hidden">
+          <Avatar className="h-10 w-10 border border-border/40 flex-shrink-0">
             {contact.avatar ? (
               <AvatarImage src={contact.avatar} alt={contact.name} className="object-cover" />
             ) : null}
@@ -25,9 +25,9 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onSelect, onDelete }
               {contact.name.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h3 className="font-medium">{contact.name}</h3>
-            <p className="text-xs text-muted-foreground">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-medium truncate">{contact.name}</h3>
+            <p className="text-xs text-muted-foreground truncate">
               {contact.age} anos • {contact.intellectualDisability}
             </p>
           </div>
@@ -35,8 +35,8 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onSelect, onDelete }
       </CardHeader>
       <CardContent className="p-4 pt-2">
         <div className="mb-3">
-          <p className="text-sm"><span className="text-muted-foreground">CID:</span> {contact.cid}</p>
-          <p className="text-sm">
+          <p className="text-sm truncate"><span className="text-muted-foreground">CID:</span> {contact.cid}</p>
+          <p className="text-sm truncate">
             <span className="text-muted-foreground">Nível de auxílio:</span>{' '}
             {contact.assistanceLevel === 'low' && 'Baixo'}
             {contact.assistanceLevel === 'medium' && 'Médio'}
