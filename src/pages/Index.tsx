@@ -10,9 +10,10 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 // Main application layout
 const AppLayout = () => {
   const [showAddContactForm, setShowAddContactForm] = useState(false);
+  const { selectedContactId } = useContacts();
   
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={true}>
       <div className="h-screen flex flex-col">
         <Header openAddContactForm={() => setShowAddContactForm(true)} />
         

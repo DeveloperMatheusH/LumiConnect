@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -20,6 +19,7 @@ const SidebarContents = () => {
   const { contacts, selectContact, selectedContactId } = useContacts();
   const [searchQuery, setSearchQuery] = useState('');
   const isMobile = useIsMobile();
+  const { setOpen } = useSidebar();
   
   const sortedContacts = useMemo(() => {
     return [...contacts].sort((a, b) => {
@@ -76,7 +76,6 @@ const SidebarContents = () => {
                   selectContact(contact.id);
                   if (isMobile) {
                     // Close sidebar on mobile after selecting a contact
-                    const { setOpen } = useSidebar();
                     setOpen(false);
                   }
                 }}
@@ -111,7 +110,11 @@ const Sidebar = () => {
   return (
     <SidebarComponent 
       className="border-r border-border"
-      // On mobile, we want the sidebar to be collapsed by default
+      style={{ 
+        // Override sidebar width for desktop to make it wider
+        '--sidebar-width': isMobile ? '18rem' : '22rem',
+      } as React.CSSProperties}
+      // Collapsible settings based on device type
       variant="sidebar"
       collapsible={isMobile ? "offcanvas" : "none"}
     >
