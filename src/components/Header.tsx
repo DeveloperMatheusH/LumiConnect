@@ -2,7 +2,7 @@
 import React from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, Menu } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Sun } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
@@ -34,8 +34,13 @@ const Header: React.FC<HeaderProps> = ({ openAddContactForm }) => {
           <SidebarTrigger className="mr-2" />
         ) : null}
         
-        <h1 className="text-xl font-medium truncate">
-          {selectedContact ? selectedContact.name : "Pessoas"}
+        <h1 className="text-xl font-medium truncate flex items-center gap-2">
+          {selectedContact ? selectedContact.name : (
+            <>
+              LumiConnect
+              <Sun className="h-5 w-5 text-amber-500" />
+            </>
+          )}
         </h1>
       </div>
       
