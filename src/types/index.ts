@@ -4,7 +4,7 @@ export interface Contact {
   name: string;
   age: number;
   intellectualDisability: string; // "DI" in Portuguese
-  assistanceLevel: "low" | "medium" | "high";
+  assistanceLevel: "leve" | "moderado" | "severo";
   cid: string;
   stereotypies: string[];
   likes: string[];

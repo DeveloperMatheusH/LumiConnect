@@ -34,8 +34,11 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
   const [name, setName] = useState(existingContact?.name || '');
   const [age, setAge] = useState(existingContact?.age.toString() || '');
   const [intellectualDisability, setIntellectualDisability] = useState(existingContact?.intellectualDisability || '');
-  const [assistanceLevel, setAssistanceLevel] = useState<'low' | 'medium' | 'high'>(
-    existingContact?.assistanceLevel || 'medium'
+  const [assistanceLevel, setAssistanceLevel] = useState<'leve' | 'moderado' | 'severo'>(
+    existingContact?.assistanceLevel === 'low' ? 'leve' :
+    existingContact?.assistanceLevel === 'medium' ? 'moderado' :
+    existingContact?.assistanceLevel === 'high' ? 'severo' :
+    existingContact?.assistanceLevel || 'moderado'
   );
   const [cid, setCid] = useState(existingContact?.cid || '');
   const [avatar, setAvatar] = useState(existingContact?.avatar || '');
@@ -85,7 +88,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       name,
       age: Number(age),
       intellectualDisability,
-      assistanceLevel: assistanceLevel as 'low' | 'medium' | 'high',
+      assistanceLevel: assistanceLevel as 'leve' | 'moderado' | 'severo',
       cid,
       stereotypies,
       likes,
@@ -123,7 +126,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
   };
   
   const handleAssistanceLevelChange = (value: string) => {
-    if (value === 'low' || value === 'medium' || value === 'high') {
+    if (value === 'leve' || value === 'moderado' || value === 'severo') {
       setAssistanceLevel(value);
     }
   };
@@ -260,7 +263,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="assistanceLevel">Nível de Auxílio</Label>
+            <Label htmlFor="assistanceLevel">Nível</Label>
             <Select
               value={assistanceLevel}
               onValueChange={handleAssistanceLevelChange}
@@ -269,9 +272,9 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
                 <SelectValue placeholder="Selecione o nível" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="low">Baixo</SelectItem>
-                <SelectItem value="medium">Médio</SelectItem>
-                <SelectItem value="high">Alto</SelectItem>
+                <SelectItem value="leve">Leve</SelectItem>
+                <SelectItem value="moderado">Moderado</SelectItem>
+                <SelectItem value="severo">Severo</SelectItem>
               </SelectContent>
             </Select>
           </div>

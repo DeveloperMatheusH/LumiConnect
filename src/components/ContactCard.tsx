@@ -37,10 +37,10 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onSelect, onDelete }
         <div className="mb-3">
           <p className="text-sm truncate"><span className="text-muted-foreground">CID:</span> {contact.cid}</p>
           <p className="text-sm truncate">
-            <span className="text-muted-foreground">Nível de auxílio:</span>{' '}
-            {contact.assistanceLevel === 'low' && 'Baixo'}
-            {contact.assistanceLevel === 'medium' && 'Médio'}
-            {contact.assistanceLevel === 'high' && 'Alto'}
+            <span className="text-muted-foreground">Nível:</span>{' '}
+            {contact.assistanceLevel === 'leve' && 'Leve'}
+            {contact.assistanceLevel === 'moderado' && 'Moderado'}
+            {contact.assistanceLevel === 'severo' && 'Severo'}
           </p>
         </div>
         
