@@ -97,4 +97,9 @@
 
 #root {
   @apply h-screen w-full;
+  margin: 0;
+  padding: 0;
+  max-width: none;
 }
+
+/* Remove any existing app.css styles that might be affecting layout */

@@ -14,7 +14,7 @@ const AppLayout = () => {
   
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="h-screen flex flex-col">
+      <div className="h-screen w-screen flex flex-col overflow-hidden">
         <Header openAddContactForm={() => setShowAddContactForm(true)} />
         
         <div className="flex-1 flex overflow-hidden">
@@ -23,7 +23,7 @@ const AppLayout = () => {
         </div>
         
         {showAddContactForm && (
-          <div className="absolute inset-0 bg-background/95 z-50 overflow-y-auto animate-fade-in p-4">
+          <div className="fixed inset-0 bg-background/95 z-50 overflow-y-auto animate-fade-in p-4">
             <AddContactForm
               onSuccess={() => setShowAddContactForm(false)}
               onCancel={() => setShowAddContactForm(false)}
