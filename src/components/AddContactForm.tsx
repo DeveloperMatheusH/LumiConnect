@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Contact, Medication } from '@/types';
@@ -35,9 +34,9 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
   const [age, setAge] = useState(existingContact?.age.toString() || '');
   const [intellectualDisability, setIntellectualDisability] = useState(existingContact?.intellectualDisability || '');
   const [assistanceLevel, setAssistanceLevel] = useState<'leve' | 'moderado' | 'severo'>(
-    existingContact?.assistanceLevel === 'low' ? 'leve' :
-    existingContact?.assistanceLevel === 'medium' ? 'moderado' :
-    existingContact?.assistanceLevel === 'high' ? 'severo' :
+    existingContact?.assistanceLevel === 'leve' ? 'leve' :
+    existingContact?.assistanceLevel === 'moderado' ? 'moderado' :
+    existingContact?.assistanceLevel === 'severo' ? 'severo' :
     existingContact?.assistanceLevel || 'moderado'
   );
   const [cid, setCid] = useState(existingContact?.cid || '');
