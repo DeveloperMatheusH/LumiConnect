@@ -44,8 +44,8 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
     ];
     setConversations(updatedConversations);
 
-    // Add introduction message
-    const introMessage = "Todo o progresso do seu aluno em um só lugar! Aqui você encontrará um panorama completo de atividades que ele realizou, seus interesses e o que ele aprendeu hoje. Acompanhe a evolução e celebre cada aprendizado!";
+    // Add introduction message with bold text and pencil icons
+    const introMessage = "<div style='display: flex; align-items: center; gap: 8px; font-weight: bold;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/><path d='m15 5 4 4'/></svg>Todo o progresso do seu aluno em um só lugar! Aqui você encontrará um panorama completo de atividades que ele realizou, seus interesses e o que ele aprendeu hoje. Acompanhe a evolução e celebre cada aprendizado!<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/><path d='m15 5 4 4'/></svg></div>";
     
     // Add message directly to the updated conversations array
     const newMessage: Message = {

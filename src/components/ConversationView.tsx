@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -110,9 +109,9 @@ const ConversationView: React.FC = () => {
             <div>
               <h4 className="text-sm font-medium text-muted-foreground mb-1">Nível de Auxílio</h4>
               <p>
-                {selectedContact.assistanceLevel === 'low' && 'Baixo'}
-                {selectedContact.assistanceLevel === 'medium' && 'Médio'}
-                {selectedContact.assistanceLevel === 'high' && 'Alto'}
+                {selectedContact.assistanceLevel === 'leve' && 'Baixo'}
+                {selectedContact.assistanceLevel === 'moderado' && 'Médio'}
+                {selectedContact.assistanceLevel === 'severo' && 'Alto'}
               </p>
             </div>
             
