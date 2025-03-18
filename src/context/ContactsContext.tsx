@@ -45,7 +45,7 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
     setConversations(updatedConversations);
 
     // Add introduction message
-    const introMessage = 'Aqui você poderá descrever as principais características de cada pessoa, desde consultas recentes até medicamentos utilizados no dia a dia.';
+    const introMessage = "Todo o progresso do seu aluno em um só lugar! Aqui você encontrará um panorama completo de atividades que ele realizou, seus interesses e o que ele aprendeu hoje. Acompanhe a evolução e celebre cada aprendizado!";
     
     // Add message directly to the updated conversations array
     const newMessage: Message = {
