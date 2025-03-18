@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AvatarUpload from './AvatarUpload';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Select,
   SelectContent,
@@ -13,8 +14,14 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface AddContactFormProps {
   onSuccess?: () => void;
@@ -42,6 +49,15 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
   const [cid, setCid] = useState(existingContact?.cid || '');
   const [avatar, setAvatar] = useState(existingContact?.avatar || '');
   
+  const [verbalCommunication, setVerbalCommunication] = useState(existingContact?.communication?.verbalCommunication || '');
+  const [nonVerbalCommunication, setNonVerbalCommunication] = useState(existingContact?.communication?.nonVerbalCommunication || '');
+  const [symbolsUse, setSymbolsUse] = useState(existingContact?.communication?.symbolsUse || '');
+  
+  const [locomotionCapacity, setLocomotionCapacity] = useState(existingContact?.mobility?.locomotionCapacity || '');
+  const [specificMotorDifficulties, setSpecificMotorDifficulties] = useState(existingContact?.mobility?.specificMotorDifficulties || '');
+  
+  const [specificNeeds, setSpecificNeeds] = useState(existingContact?.specificNeeds || '');
+  
   const [newStereotypy, setNewStereotypy] = useState('');
   const [stereotypies, setStereotypies] = useState(existingContact?.stereotypies || []);
   
@@ -51,7 +67,6 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
   const [newDislike, setNewDislike] = useState('');
   const [dislikes, setDislikes] = useState(existingContact?.dislikes || []);
   
-  // Medication state
   const [medications, setMedications] = useState<Medication[]>(existingContact?.medications || []);
   const [newMedication, setNewMedication] = useState({
     name: '',
@@ -83,7 +98,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
     
     if (!validateForm()) return;
     
-    const contactData = {
+    const contactData: Omit<Contact, 'id'> = {
       name,
       age: Number(age),
       intellectualDisability,
@@ -93,7 +108,17 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       likes,
       dislikes,
       medications,
-      avatar
+      avatar,
+      communication: {
+        verbalCommunication: verbalCommunication.trim() || undefined,
+        nonVerbalCommunication: nonVerbalCommunication.trim() || undefined,
+        symbolsUse: symbolsUse.trim() || undefined
+      },
+      mobility: {
+        locomotionCapacity: locomotionCapacity.trim() || undefined,
+        specificMotorDifficulties: specificMotorDifficulties.trim() || undefined
+      },
+      specificNeeds: specificNeeds.trim() || undefined
     };
     
     if (existingContact) {
@@ -205,7 +230,6 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Avatar Section */}
         <div className="flex flex-col items-center mb-4">
           <AvatarUpload 
             name={name || 'Contato'}
@@ -291,7 +315,108 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
           </div>
         </div>
         
-        {/* Medications Section */}
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="communication">
+            <AccordionTrigger className="text-lg font-medium py-2">
+              Comunicação
+            </AccordionTrigger>
+            <AccordionContent className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label htmlFor="verbalCommunication">Comunicação Verbal</Label>
+                <Textarea
+                  id="verbalCommunication"
+                  value={verbalCommunication}
+                  onChange={(e) => setVerbalCommunication(e.target.value)}
+                  placeholder="Descreva o nível de fluência verbal, dificuldades, etc."
+                  className="min-h-[80px]"
+                />
+                <p className="text-xs text-muted-foreground">Descreva como a pessoa se comunica verbalmente, nível de fluência, vocabulário, dificuldades específicas.</p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="nonVerbalCommunication">Comunicação Não-Verbal</Label>
+                <Textarea
+                  id="nonVerbalCommunication"
+                  value={nonVerbalCommunication}
+                  onChange={(e) => setNonVerbalCommunication(e.target.value)}
+                  placeholder="Descreva gestos, expressões faciais, linguagem corporal, etc."
+                  className="min-h-[80px]"
+                />
+                <p className="text-xs text-muted-foreground">Descreva como a pessoa se comunica através de gestos, expressões faciais e linguagem corporal.</p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="symbolsUse">Uso de Símbolos</Label>
+                <Textarea
+                  id="symbolsUse"
+                  value={symbolsUse}
+                  onChange={(e) => setSymbolsUse(e.target.value)}
+                  placeholder="Descreva o uso de PEC's, pranchas de comunicação, etc."
+                  className="min-h-[80px]"
+                />
+                <p className="text-xs text-muted-foreground">Descreva como a pessoa utiliza sistemas de comunicação alternativa como PEC's ou pranchas de comunicação.</p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          <AccordionItem value="mobility">
+            <AccordionTrigger className="text-lg font-medium py-2">
+              Mobilidade
+            </AccordionTrigger>
+            <AccordionContent className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label htmlFor="locomotionCapacity">Capacidade de Locomoção</Label>
+                <Select
+                  value={locomotionCapacity}
+                  onValueChange={setLocomotionCapacity}
+                >
+                  <SelectTrigger id="locomotionCapacity">
+                    <SelectValue placeholder="Selecione a capacidade de locomoção" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="independente">Independente</SelectItem>
+                    <SelectItem value="com_auxilio">Com auxílio</SelectItem>
+                    <SelectItem value="cadeira_de_rodas">Cadeira de rodas</SelectItem>
+                    <SelectItem value="outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Indique como a pessoa se locomove.</p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="specificMotorDifficulties">Dificuldades Motoras Específicas</Label>
+                <Textarea
+                  id="specificMotorDifficulties"
+                  value={specificMotorDifficulties}
+                  onChange={(e) => setSpecificMotorDifficulties(e.target.value)}
+                  placeholder="Descreva dificuldades motoras específicas, como coordenação motora fina, movimentos repetitivos, etc."
+                  className="min-h-[80px]"
+                />
+                <p className="text-xs text-muted-foreground">Descreva em detalhes as dificuldades motoras específicas que a pessoa apresenta.</p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          <AccordionItem value="specificNeeds">
+            <AccordionTrigger className="text-lg font-medium py-2">
+              Outras Necessidades Específicas
+            </AccordionTrigger>
+            <AccordionContent className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label htmlFor="specificNeeds">Necessidades Específicas</Label>
+                <Textarea
+                  id="specificNeeds"
+                  value={specificNeeds}
+                  onChange={(e) => setSpecificNeeds(e.target.value)}
+                  placeholder="Descreva outras necessidades específicas que não se encaixam nas categorias anteriores."
+                  className="min-h-[120px]"
+                />
+                <p className="text-xs text-muted-foreground">Use este espaço para registrar informações adicionais sobre necessidades específicas que não foram abordadas em outras seções.</p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        
         <div className="space-y-4 pt-2 border-t">
           <h2 className="text-lg font-medium">Medicamentos</h2>
           
@@ -377,7 +502,6 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
             </Button>
           </div>
           
-          {/* List of added medications */}
           {medications.length > 0 && (
             <div className="mt-4 space-y-3">
               <h3 className="text-sm font-medium">Medicamentos Adicionados</h3>

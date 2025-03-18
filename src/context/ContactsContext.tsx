@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Contact, Conversation, Message, Medication } from '@/types';
+import { Contact, Conversation, Message, Medication, MediaAttachment } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -13,10 +12,12 @@ interface ContactsContextType {
   updateContact: (id: string, contact: Partial<Contact>) => void;
   deleteContact: (id: string) => void;
   selectContact: (id: string | null) => void;
-  addMessage: (contactId: string, content: string, isUser: boolean) => void;
+  addMessage: (contactId: string, content: string, isUser: boolean, mediaAttachments?: MediaAttachment[]) => void;
   getContactById: (id: string) => Contact | undefined;
   getConversationByContactId: (contactId: string) => Conversation | undefined;
   updateAvatar: (contactId: string, avatarData: string) => void;
+  addMediaAttachment: (contactId: string, type: "image" | "video" | "audio", url: string, name: string) => void;
+  getMediaAttachments: (contactId: string) => MediaAttachment[];
 }
 
 const ContactsContext = createContext<ContactsContextType | undefined>(undefined);
@@ -130,13 +131,14 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
     setSelectedContactId(id);
   };
 
-  const addMessage = (contactId: string, content: string, isUser: boolean) => {
+  const addMessage = (contactId: string, content: string, isUser: boolean, mediaAttachments?: MediaAttachment[]) => {
     const newMessage: Message = {
       id: uuidv4(),
       contactId,
       content,
       timestamp: new Date(),
-      isUser
+      isUser,
+      mediaAttachments
     };
 
     setConversations((prev) => {
@@ -166,6 +168,41 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const addMediaAttachment = (contactId: string, type: "image" | "video" | "audio", url: string, name: string) => {
+    const newMediaAttachment: MediaAttachment = {
+      id: uuidv4(),
+      type,
+      url,
+      name,
+      timestamp: new Date()
+    };
+
+    // Create a message with the media attachment
+    addMessage(
+      contactId,
+      type === "image" ? "Imagem enviada" : 
+      type === "video" ? "Vídeo enviado" : 
+      "Áudio enviado",
+      true,
+      [newMediaAttachment]
+    );
+
+    toast({
+      title: `${type === "image" ? "Imagem" : type === "video" ? "Vídeo" : "Áudio"} enviado`,
+      description: "Mídia adicionada com sucesso!"
+    });
+  };
+
+  const getMediaAttachments = (contactId: string): MediaAttachment[] => {
+    const conversation = getConversationByContactId(contactId);
+    if (!conversation) return [];
+
+    // Extrair e aplanar todos os anexos de mídia de todas as mensagens
+    return conversation.messages
+      .filter(message => message.mediaAttachments && message.mediaAttachments.length > 0)
+      .flatMap(message => message.mediaAttachments || []);
+  };
+
   const getContactById = (id: string) => {
     return contacts.find((contact) => contact.id === id);
   };
@@ -187,7 +224,9 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
         addMessage,
         getContactById,
         getConversationByContactId,
-        updateAvatar
+        updateAvatar,
+        addMediaAttachment,
+        getMediaAttachments
       }}
     >
       {children}
