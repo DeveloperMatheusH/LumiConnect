@@ -72,7 +72,7 @@ const ConversationView: React.FC = () => {
         className="absolute inset-0 pointer-events-none z-0 opacity-40 bg-center bg-no-repeat bg-cover"
         style={{ 
           backgroundImage: 'url("/lamp-stars-bg.svg")',
-          backgroundSize: '40%',
+          backgroundSize: '50%',
           backgroundPosition: 'center',
         }}
       />

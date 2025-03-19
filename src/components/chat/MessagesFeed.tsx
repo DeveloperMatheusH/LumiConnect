@@ -20,7 +20,7 @@ const MessagesFeed: React.FC<MessagesFeedProps> = ({ conversation }) => {
   if (!conversation || conversation.messages.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4 relative z-10">
-        <p className="max-w-xs backdrop-blur-sm bg-background/30 p-4 rounded-lg">
+        <p className="max-w-xs backdrop-blur-sm bg-background/30 p-4 rounded-lg shadow-sm">
           Nenhuma mensagem ainda. Envie uma mensagem para começar uma conversa.
         </p>
       </div>
