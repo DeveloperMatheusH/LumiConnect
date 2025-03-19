@@ -1,182 +1,216 @@
-
 import React, { useState, useRef } from 'react';
-import { Camera, Video, Mic, X, Upload } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { v4 as uuidv4 } from 'uuid';
 import { useContacts } from '@/context/ContactsContext';
-import { MediaAttachment } from '@/types';
-import { toast } from '@/components/ui/use-toast';
+import { ActivityType } from '@/types';
+import { Button } from '@/components/ui/button';
+import { X, Upload, Camera, Film, Mic } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface MediaUploadProps {
   contactId: string;
   onClose: () => void;
+  activityType?: ActivityType;
 }
 
-const MediaUpload: React.FC<MediaUploadProps> = ({ contactId, onClose }) => {
-  const { addMediaAttachment } = useContacts();
-  const [activeTab, setActiveTab] = useState<'image' | 'video' | 'audio'>('image');
-  const [isLoading, setIsLoading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
+const MediaUpload: React.FC<MediaUploadProps> = ({ 
+  contactId, 
+  onClose,
+  activityType = 'general'
+}) => {
+  const [activeTab, setActiveTab] = useState<"upload" | "record">("upload");
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const [uploading, setUploading] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
-
-    // Validação de tamanho (10MB máximo)
-    if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: "Arquivo muito grande",
-        description: "O arquivo deve ter no máximo 10MB",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
     
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result as string);
-      setIsLoading(false);
-    };
-    reader.onerror = () => {
-      toast({
-        title: "Erro ao carregar arquivo",
-        description: "Não foi possível processar o arquivo selecionado",
-        variant: "destructive"
-      });
-      setIsLoading(false);
-    };
-    
-    reader.readAsDataURL(file);
+    setMediaFile(file);
+    setMediaPreview(URL.createObjectURL(file));
   };
   
-  const handleUpload = () => {
-    if (!preview) return;
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder.current = new MediaRecorder(stream);
+      mediaRecorder.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          setAudioChunks((prev) => [...prev, event.data]);
+        }
+      };
+      mediaRecorder.current.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const audioFile = new File([audioBlob], 'recording.webm', { type: 'audio/webm' });
+        setMediaFile(audioFile);
+        setMediaPreview(URL.createObjectURL(audioFile));
+        setAudioChunks([]);
+        setIsRecording(false);
+      };
+      mediaRecorder.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Erro ao iniciar a gravação:", error);
+    }
+  };
+  
+  const handleStopRecording = () => {
+    if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
+      mediaRecorder.current.stop();
+    }
+  };
+  
+  const handleUpload = async () => {
+    if (!mediaFile || !contactId) return;
     
-    addMediaAttachment(contactId, activeTab, preview, `${activeTab}_${new Date().getTime()}`);
+    setUploading(true);
+    
+    try {
+      const fileURL = mediaPreview || '';
+      
+      const newMedia = {
+        id: uuidv4(),
+        type: mediaFile.type.startsWith('image')
+          ? 'image'
+          : mediaFile.type.startsWith('video')
+            ? 'video'
+            : 'audio',
+        url: fileURL,
+        name: mediaFile.name,
+        timestamp: new Date(),
+      };
+      
+      useContacts().addMessage(contactId, '', true, [newMedia], activityType);
+      onClose();
+    } catch (error) {
+      console.error("Erro ao enviar mídia:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
+  
+  const handleCancel = () => {
+    setMediaFile(null);
+    setMediaPreview(null);
     onClose();
   };
   
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-  
   return (
-    <div className="fixed inset-0 bg-background/95 z-50 flex flex-col items-center justify-center p-4 animate-fade-in">
-      <div className="bg-card rounded-lg shadow-lg max-w-md w-full overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-medium">Adicionar mídia</h2>
+    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+      <div className="bg-secondary rounded-lg shadow-lg w-full max-w-md flex flex-col">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <h2 className="text-lg font-medium">Adicionar Mídia</h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
         </div>
         
-        <div className="flex border-b">
-          <button
-            className={`flex-1 p-3 text-center ${activeTab === 'image' ? 'border-b-2 border-primary' : ''}`}
-            onClick={() => setActiveTab('image')}
-          >
-            <Camera className="h-5 w-5 mx-auto mb-1" />
-            <span className="text-sm">Imagem</span>
-          </button>
-          <button
-            className={`flex-1 p-3 text-center ${activeTab === 'video' ? 'border-b-2 border-primary' : ''}`}
-            onClick={() => setActiveTab('video')}
-          >
-            <Video className="h-5 w-5 mx-auto mb-1" />
-            <span className="text-sm">Vídeo</span>
-          </button>
-          <button
-            className={`flex-1 p-3 text-center ${activeTab === 'audio' ? 'border-b-2 border-primary' : ''}`}
-            onClick={() => setActiveTab('audio')}
-          >
-            <Mic className="h-5 w-5 mx-auto mb-1" />
-            <span className="text-sm">Áudio</span>
-          </button>
-        </div>
-        
-        <div className="p-4">
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            accept={
-              activeTab === 'image' ? 'image/*' : 
-              activeTab === 'video' ? 'video/*' : 
-              'audio/*'
-            }
-            onChange={handleFileChange}
-          />
+        <Tabs defaultValue="upload" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="m-2">
+            <TabsTrigger value="upload" className="flex-1">Enviar</TabsTrigger>
+            <TabsTrigger value="record" className="flex-1">Gravar</TabsTrigger>
+          </TabsList>
           
-          {!preview ? (
-            <div 
-              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:bg-accent/10"
-              onClick={triggerFileInput}
-            >
-              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm font-medium">Clique para selecionar um arquivo</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {activeTab === 'image' ? 'JPG, PNG ou GIF' : 
-                 activeTab === 'video' ? 'MP4, WebM ou MOV' : 
-                 'MP3, WAV ou OGG'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">Tamanho máximo: 10MB</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {activeTab === 'image' && (
-                <div className="relative w-full aspect-video bg-black/10 rounded-lg overflow-hidden">
+          <TabsContent value="upload" className="p-4 flex flex-col gap-4">
+            {mediaPreview ? (
+              <div className="relative w-full rounded-md overflow-hidden">
+                {mediaFile?.type.startsWith('image') && (
                   <img 
-                    src={preview} 
-                    alt="Preview" 
-                    className="w-full h-full object-contain"
+                    src={mediaPreview} 
+                    alt="Pré-visualização" 
+                    className="w-full object-contain max-h-[300px]"
                   />
-                </div>
-              )}
-              {activeTab === 'video' && (
-                <div className="relative w-full aspect-video bg-black/10 rounded-lg overflow-hidden">
+                )}
+                {mediaFile?.type.startsWith('video') && (
                   <video 
-                    src={preview} 
-                    controls 
-                    className="w-full h-full"
-                  />
-                </div>
-              )}
-              {activeTab === 'audio' && (
-                <div className="relative w-full p-4 bg-accent/10 rounded-lg">
+                    src={mediaPreview} 
+                    controls
+                    className="w-full max-h-[300px]"
+                  >
+                    Seu navegador não suporta a reprodução de vídeo.
+                  </video>
+                )}
+                {mediaFile?.type.startsWith('audio') && (
                   <audio 
-                    src={preview} 
-                    controls 
+                    src={mediaPreview} 
+                    controls
                     className="w-full"
-                  />
-                </div>
-              )}
-              
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  className="flex-1"
-                  onClick={() => {
-                    setPreview(null);
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = '';
-                    }
-                  }}
+                  >
+                    Seu navegador não suporta a reprodução de áudio.
+                  </audio>
+                )}
+              </div>
+            ) : (
+              <div 
+                className="border-dashed border-2 border-border rounded-md p-6 text-center cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="h-6 w-6 mx-auto text-muted-foreground" />
+                <p className="text-sm text-muted-foreground mt-2">
+                  Clique para selecionar um arquivo
+                </p>
+              </div>
+            )}
+            
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileSelect}
+              accept="image/*, video/*, audio/*"
+            />
+          </TabsContent>
+          
+          <TabsContent value="record" className="p-4 flex flex-col gap-4">
+            {mediaPreview ? (
+              <div className="relative w-full rounded-md overflow-hidden">
+                <audio 
+                  src={mediaPreview} 
+                  controls
+                  className="w-full"
                 >
-                  Alterar
-                </Button>
+                  Seu navegador não suporta a reprodução de áudio.
+                </audio>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center">
                 <Button 
-                  className="flex-1"
-                  onClick={handleUpload}
-                  disabled={isLoading}
+                  variant={isRecording ? "destructive" : "outline"}
+                  onClick={isRecording ? handleStopRecording : handleStartRecording}
+                  disabled={uploading}
                 >
-                  {isLoading ? 'Processando...' : 'Enviar'}
+                  {isRecording ? (
+                    <>
+                      <Mic className="mr-2 h-4 w-4" />
+                      Parar de gravar
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="mr-2 h-4 w-4" />
+                      Gravar áudio
+                    </>
+                  )}
                 </Button>
               </div>
-            </div>
-          )}
+            )}
+          </TabsContent>
+        </Tabs>
+        
+        <div className="p-4 border-t border-border flex justify-end gap-2">
+          <Button variant="ghost" onClick={handleCancel}>
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleUpload} 
+            disabled={!mediaFile || uploading}
+          >
+            {uploading ? 'Enviando...' : 'Enviar'}
+          </Button>
         </div>
       </div>
     </div>

@@ -9,10 +9,10 @@ import {
   TrendingUp, 
   AlertTriangle, 
   Star, 
-  MessageCircle,
-  PuzzlePiece
+  MessageCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import PuzzlePieceIcon from './PuzzlePieceIcon';
 
 interface ActivityIconProps {
   type: ActivityType;
@@ -67,7 +67,7 @@ const ActivityIcon: React.FC<ActivityIconProps> = ({
       case 'general':
         return <MessageCircle size={size} />;
       default:
-        return <PuzzlePiece size={size} />;
+        return <PuzzlePieceIcon size={size} />;
     }
   };
 
