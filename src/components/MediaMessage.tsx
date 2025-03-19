@@ -1,14 +1,16 @@
 
 import React from 'react';
-import { MediaAttachment } from '@/types';
+import { MediaAttachment, ActivityType } from '@/types';
 import { format } from 'date-fns';
+import ActivityIcon from './ActivityIcon';
 
 interface MediaMessageProps {
   media: MediaAttachment;
   isUser: boolean;
+  activityType?: ActivityType;
 }
 
-const MediaMessage: React.FC<MediaMessageProps> = ({ media, isUser }) => {
+const MediaMessage: React.FC<MediaMessageProps> = ({ media, isUser, activityType = 'general' }) => {
   const mediaDate = new Date(media.timestamp);
   const formattedTime = format(mediaDate, 'HH:mm');
   
@@ -20,6 +22,11 @@ const MediaMessage: React.FC<MediaMessageProps> = ({ media, isUser }) => {
           : 'bg-secondary rounded-tl-none'
       }`}
     >
+      <div className="flex items-center mb-2">
+        <ActivityIcon type={activityType} className="mr-2" />
+        <span className="text-xs">{media.type === 'image' ? 'Imagem' : media.type === 'video' ? 'Vídeo' : 'Áudio'}</span>
+      </div>
+      
       {media.type === 'image' && (
         <div className="relative w-full rounded-md overflow-hidden">
           <img 

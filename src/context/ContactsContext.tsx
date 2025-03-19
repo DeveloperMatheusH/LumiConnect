@@ -1,6 +1,7 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Contact, Conversation, Message, Medication, MediaAttachment } from '@/types';
+import { Contact, Conversation, Message, Medication, MediaAttachment, ActivityType } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,11 +13,11 @@ interface ContactsContextType {
   updateContact: (id: string, contact: Partial<Contact>) => void;
   deleteContact: (id: string) => void;
   selectContact: (id: string | null) => void;
-  addMessage: (contactId: string, content: string, isUser: boolean, mediaAttachments?: MediaAttachment[]) => void;
+  addMessage: (contactId: string, content: string, isUser: boolean, mediaAttachments?: MediaAttachment[], activityType?: ActivityType) => void;
   getContactById: (id: string) => Contact | undefined;
   getConversationByContactId: (contactId: string) => Conversation | undefined;
   updateAvatar: (contactId: string, avatarData: string) => void;
-  addMediaAttachment: (contactId: string, type: "image" | "video" | "audio", url: string, name: string) => void;
+  addMediaAttachment: (contactId: string, type: "image" | "video" | "audio", url: string, name: string, activityType?: ActivityType) => void;
   getMediaAttachments: (contactId: string) => MediaAttachment[];
 }
 
@@ -45,8 +46,8 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
     ];
     setConversations(updatedConversations);
 
-    // Add introduction message
-    const introMessage = "Todo o progresso do seu aluno em um só lugar! Aqui você encontrará um panorama completo de atividades que ele realizou, seus interesses e o que ele aprendeu hoje. Acompanhe a evolução e celebre cada aprendizado!";
+    // Add introduction message with pencil icons and bold text
+    const introMessage = "<div style='display: flex; align-items: center; gap: 8px; font-weight: bold;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/><path d='m15 5 4 4'/></svg>Todo o progresso do seu aluno em um só lugar! Aqui você encontrará um panorama completo de atividades que ele realizou, seus interesses e o que ele aprendeu hoje. Acompanhe a evolução e celebre cada aprendizado!<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/><path d='m15 5 4 4'/></svg></div>";
     
     // Add message directly to the updated conversations array
     const newMessage: Message = {
@@ -54,7 +55,8 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       contactId: newContact.id,
       content: introMessage,
       timestamp: new Date(),
-      isUser: false
+      isUser: false,
+      activityType: 'important'
     };
     
     // Find the conversation we just added and update it with the intro message
@@ -75,10 +77,15 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
     // Select the newly created contact
     setSelectedContactId(newContact.id);
     
-    toast({
+    const toastId = toast({
       title: "Contato adicionado",
       description: `${contact.name} foi adicionado à sua lista de contatos.`
     });
+    
+    // Auto-dismiss the toast after 3 seconds
+    setTimeout(() => {
+      toast.dismiss(toastId.id);
+    }, 3000);
   };
 
   const updateContact = (id: string, updatedFields: Partial<Contact>) => {
@@ -88,10 +95,15 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       )
     );
     
-    toast({
+    const toastId = toast({
       title: "Contato atualizado",
       description: "As informações do contato foram atualizadas."
     });
+    
+    // Auto-dismiss the toast after 3 seconds
+    setTimeout(() => {
+      toast.dismiss(toastId.id);
+    }, 3000);
   };
 
   const updateAvatar = (contactId: string, avatarData: string) => {
@@ -103,10 +115,15 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       )
     );
 
-    toast({
+    const toastId = toast({
       title: "Foto atualizada",
       description: "A foto do perfil foi atualizada com sucesso."
     });
+    
+    // Auto-dismiss the toast after 3 seconds
+    setTimeout(() => {
+      toast.dismiss(toastId.id);
+    }, 3000);
   };
 
   const deleteContact = (id: string) => {
@@ -120,25 +137,37 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       setSelectedContactId(null);
     }
     
-    toast({
+    const toastId = toast({
       title: "Contato removido",
       description: `${contactToDelete.name} foi removido da sua lista de contatos.`,
       variant: "destructive"
     });
+    
+    // Auto-dismiss the toast after 3 seconds
+    setTimeout(() => {
+      toast.dismiss(toastId.id);
+    }, 3000);
   };
 
   const selectContact = (id: string | null) => {
     setSelectedContactId(id);
   };
 
-  const addMessage = (contactId: string, content: string, isUser: boolean, mediaAttachments?: MediaAttachment[]) => {
+  const addMessage = (
+    contactId: string, 
+    content: string, 
+    isUser: boolean, 
+    mediaAttachments?: MediaAttachment[],
+    activityType: ActivityType = 'general'
+  ) => {
     const newMessage: Message = {
       id: uuidv4(),
       contactId,
       content,
       timestamp: new Date(),
       isUser,
-      mediaAttachments
+      mediaAttachments,
+      activityType
     };
 
     setConversations((prev) => {
@@ -168,7 +197,13 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const addMediaAttachment = (contactId: string, type: "image" | "video" | "audio", url: string, name: string) => {
+  const addMediaAttachment = (
+    contactId: string, 
+    type: "image" | "video" | "audio", 
+    url: string, 
+    name: string,
+    activityType: ActivityType = 'general'
+  ) => {
     const newMediaAttachment: MediaAttachment = {
       id: uuidv4(),
       type,
@@ -184,13 +219,19 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       type === "video" ? "Vídeo enviado" : 
       "Áudio enviado",
       true,
-      [newMediaAttachment]
+      [newMediaAttachment],
+      activityType
     );
 
-    toast({
+    const toastId = toast({
       title: `${type === "image" ? "Imagem" : type === "video" ? "Vídeo" : "Áudio"} enviado`,
       description: "Mídia adicionada com sucesso!"
     });
+    
+    // Auto-dismiss the toast after 3 seconds
+    setTimeout(() => {
+      toast.dismiss(toastId.id);
+    }, 3000);
   };
 
   const getMediaAttachments = (contactId: string): MediaAttachment[] => {

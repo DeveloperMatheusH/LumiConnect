@@ -1,10 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useContacts } from '@/context/ContactsContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit, Info, Image, Paperclip, FolderOpen } from 'lucide-react';
+import { Trash2, Edit, Info, Image, Paperclip, FolderOpen, PenLine } from 'lucide-react';
 import AddContactForm from './AddContactForm';
 import AvatarUpload from './AvatarUpload';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -25,6 +24,10 @@ import MediaMessage from './MediaMessage';
 import MediaUpload from './MediaUpload';
 import MediaGallery from './MediaGallery';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ActivityType } from '@/types';
+import TimelineMessage from './TimelineMessage';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const ConversationView: React.FC = () => {
   const { 
@@ -43,6 +46,7 @@ const ConversationView: React.FC = () => {
   const [showMediaUpload, setShowMediaUpload] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [activeTabInfo, setActiveTabInfo] = useState('general');
+  const [selectedActivityType, setSelectedActivityType] = useState<ActivityType>('general');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const isMobile = useIsMobile();
@@ -55,7 +59,6 @@ const ConversationView: React.FC = () => {
     ? getConversationByContactId(selectedContactId)
     : null;
   
-  // Rolar para o final das mensagens quando uma nova mensagem for adicionada
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -79,7 +82,7 @@ const ConversationView: React.FC = () => {
     e.preventDefault();
     if (!messageInput.trim() || !selectedContactId) return;
     
-    addMessage(selectedContactId, messageInput, true);
+    addMessage(selectedContactId, messageInput, true, undefined, selectedActivityType);
     setMessageInput('');
   };
 
@@ -89,36 +92,13 @@ const ConversationView: React.FC = () => {
     }
   };
   
-  const renderMessageContent = (message: any) => {
-    // Verificar se a mensagem tem anexos de mídia
-    if (message.mediaAttachments && message.mediaAttachments.length > 0) {
-      return (
-        <div className="space-y-2">
-          {message.content && (
-            <p className="text-sm mb-2">{message.content}</p>
-          )}
-          {message.mediaAttachments.map((media: any) => (
-            <MediaMessage 
-              key={media.id} 
-              media={media} 
-              isUser={message.isUser} 
-            />
-          ))}
-        </div>
-      );
-    }
-    
-    // Mensagem de texto normal
-    return <p className="text-sm">{message.content}</p>;
-  };
-  
   return (
     <div className="flex-1 flex flex-col h-full animate-fade-in relative">
-      {/* Componentes de sobreposição */}
       {showMediaUpload && selectedContactId && (
         <MediaUpload 
           contactId={selectedContactId} 
           onClose={() => setShowMediaUpload(false)} 
+          activityType={selectedActivityType}
         />
       )}
       
@@ -129,7 +109,6 @@ const ConversationView: React.FC = () => {
         />
       )}
       
-      {/* Contact Info */}
       {showContactInfo && (
         <div className="absolute inset-0 z-20 bg-background/95 p-4 flex flex-col animate-fade-in overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
@@ -342,7 +321,6 @@ const ConversationView: React.FC = () => {
         </div>
       )}
       
-      {/* Edit Form */}
       {showEditForm && (
         <div className="absolute inset-0 z-10 bg-background/95 p-4 animate-fade-in">
           <AddContactForm 
@@ -352,7 +330,6 @@ const ConversationView: React.FC = () => {
         </div>
       )}
       
-      {/* Chat Header */}
       <div className="px-4 py-3 border-b border-border flex justify-between items-center">
         <div className="flex items-center gap-3">
           <AvatarUpload
@@ -410,7 +387,6 @@ const ConversationView: React.FC = () => {
         </div>
       </div>
       
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
         {!conversation || conversation.messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
@@ -419,46 +395,67 @@ const ConversationView: React.FC = () => {
             </p>
           </div>
         ) : (
-          conversation.messages.map((message) => {
-            const messageDate = new Date(message.timestamp);
-            const formattedTime = format(messageDate, 'HH:mm');
-            
-            return (
-              <div 
-                key={message.id}
-                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} animate-slide-up`}
-              >
-                <div 
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    message.isUser 
-                      ? 'bg-primary text-primary-foreground rounded-tr-none' 
-                      : 'bg-secondary rounded-tl-none'
-                  }`}
-                >
-                  {renderMessageContent(message)}
-                  <p className="text-xs opacity-70 text-right mt-1">{formattedTime}</p>
-                </div>
+          <>
+            <div className="text-center mb-2">
+              <div className="inline-flex items-center justify-center bg-muted px-3 py-1 rounded-full text-xs text-muted-foreground">
+                <PenLine size={12} className="mr-1" />
+                <span>Linha do tempo visual</span>
               </div>
-            );
-          })
+            </div>
+            
+            {conversation.messages.map((message) => (
+              <TimelineMessage key={message.id} message={message} />
+            ))}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>
       
-      {/* Message Input */}
       <div className="p-3 border-t border-border">
         <form onSubmit={handleSendMessage} className="flex flex-col gap-2">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-muted-foreground flex items-center">
+              <span className="mr-2">Tipo de atividade:</span>
+              <Select 
+                value={selectedActivityType}
+                onValueChange={(value) => setSelectedActivityType(value as ActivityType)}
+              >
+                <SelectTrigger className="w-[180px] h-8">
+                  <SelectValue placeholder="Tipo de atividade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="general">Geral</SelectItem>
+                  <SelectItem value="therapy">Terapia</SelectItem>
+                  <SelectItem value="school">Escola</SelectItem>
+                  <SelectItem value="leisure">Lazer</SelectItem>
+                  <SelectItem value="meal">Refeição</SelectItem>
+                  <SelectItem value="progress">Progresso</SelectItem>
+                  <SelectItem value="challenge">Desafio</SelectItem>
+                  <SelectItem value="important">Importante</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
           <div className="flex justify-between items-center">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowMediaUpload(true)}
-              className="h-9 w-9 rounded-full"
-              title="Adicionar mídia"
-            >
-              <Paperclip className="h-5 w-5" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowMediaUpload(true)}
+                    className="h-9 w-9 rounded-full"
+                  >
+                    <Paperclip className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Adicionar mídia</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             
             <div className="flex-1 mx-2">
               <Input
@@ -480,7 +477,6 @@ const ConversationView: React.FC = () => {
         </form>
       </div>
       
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
         <AlertDialogContent className={isMobile ? "w-[90%] max-w-md" : ""}>
           <AlertDialogHeader>

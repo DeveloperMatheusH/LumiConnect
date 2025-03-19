@@ -45,6 +45,7 @@ export interface Message {
   timestamp: Date;
   isUser: boolean;
   mediaAttachments?: MediaAttachment[]; // Anexos de mídia
+  activityType?: ActivityType; // Tipo de atividade para a linha do tempo
 }
 
 export interface MediaAttachment {
@@ -59,3 +60,14 @@ export interface Conversation {
   contactId: string;
   messages: Message[];
 }
+
+// Tipos de atividades para a linha do tempo visual
+export type ActivityType = 
+  | "therapy" // Terapias
+  | "school" // Atividades escolares
+  | "leisure" // Momentos de lazer
+  | "meal" // Refeições
+  | "progress" // Progresso positivo
+  | "challenge" // Desafios
+  | "important" // Momentos importantes
+  | "general"; // Mensagens gerais
