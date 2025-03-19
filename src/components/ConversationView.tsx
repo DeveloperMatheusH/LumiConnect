@@ -9,6 +9,7 @@ import MessageInput from './chat/MessageInput';
 import DeleteContactDialog from './contact/DeleteContactDialog';
 import MediaUpload from './MediaUpload';
 import MediaGallery from './MediaGallery';
+import { ActivityType } from '@/types';
 
 const ConversationView: React.FC = () => {
   const { 
@@ -23,7 +24,7 @@ const ConversationView: React.FC = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [showContactInfo, setShowContactInfo] = useState(false);
-  const [showMediaUpload, setShowMediaUpload] = useState(false);
+  const [showMediaUpload, setShowMediaUpload] = useState<boolean | ActivityType>(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   
   const selectedContact = selectedContactId 
@@ -47,7 +48,7 @@ const ConversationView: React.FC = () => {
     );
   }
   
-  const handleSendMessage = (messageContent: string, activityType: string) => {
+  const handleSendMessage = (messageContent: string, activityType: ActivityType) => {
     if (!messageContent.trim() || !selectedContactId) return;
     addMessage(selectedContactId, messageContent, true, undefined, activityType);
   };
@@ -70,7 +71,7 @@ const ConversationView: React.FC = () => {
         <MediaUpload 
           contactId={selectedContactId} 
           onClose={() => setShowMediaUpload(false)} 
-          activityType={showMediaUpload ? 'general' : undefined}
+          activityType={typeof showMediaUpload === 'string' ? showMediaUpload as ActivityType : 'general'}
         />
       )}
       
