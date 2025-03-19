@@ -67,6 +67,16 @@ const ConversationView: React.FC = () => {
   
   return (
     <div className="flex-1 flex flex-col h-full animate-fade-in relative">
+      {/* Chat background with lamp and stars at 40% opacity */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-0 opacity-40 bg-center bg-no-repeat bg-cover"
+        style={{ 
+          backgroundImage: 'url("/lamp-stars-bg.svg")',
+          backgroundSize: '40%',
+          backgroundPosition: 'center',
+        }}
+      />
+      
       {showMediaUpload && selectedContactId && (
         <MediaUpload 
           contactId={selectedContactId} 
@@ -112,7 +122,7 @@ const ConversationView: React.FC = () => {
         onAvatarChange={handleAvatarChange}
       />
       
-      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin relative z-1">
         <MessagesFeed conversation={conversation} />
       </div>
       

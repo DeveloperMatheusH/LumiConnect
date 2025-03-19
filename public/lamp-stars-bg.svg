@@ -1,0 +1,38 @@
+
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Stars -->
+  <circle cx="100" cy="80" r="3" fill="#FFFFFF" />
+  <circle cx="150" cy="60" r="2" fill="#FFFFFF" />
+  <circle cx="200" cy="40" r="4" fill="#FFFFFF" />
+  <circle cx="250" cy="70" r="3" fill="#FFFFFF" />
+  <circle cx="300" cy="90" r="2" fill="#FFFFFF" />
+  <circle cx="80" cy="120" r="2" fill="#FFFFFF" />
+  <circle cx="120" cy="150" r="3" fill="#FFFFFF" />
+  <circle cx="220" cy="130" r="2" fill="#FFFFFF" />
+  <circle cx="280" cy="140" r="3" fill="#FFFFFF" />
+  <circle cx="330" cy="120" r="2" fill="#FFFFFF" />
+
+  <!-- Lamp -->
+  <path d="M200 90C170 90 150 130 150 170C150 210 170 230 170 240H230C230 230 250 210 250 170C250 130 230 90 200 90Z" fill="#9b87f5" />
+  <path d="M170 240H230V260C230 270 215 280 200 280C185 280 170 270 170 260V240Z" fill="#7E69AB" />
+  <path d="M190 280H210V320C210 325 205 330 200 330C195 330 190 325 190 320V280Z" fill="#6E59A5" />
+  
+  <!-- Base -->
+  <path d="M180 330H220C225 330 230 335 230 340C230 345 225 350 220 350H180C175 350 170 345 170 340C170 335 175 330 180 330Z" fill="#6E59A5" />
+  
+  <!-- Light Glow -->
+  <circle cx="200" cy="170" r="30" fill="#FEF7CD" fillOpacity="0.5" />
+  
+  <!-- Small Stars inside Lamp -->
+  <circle cx="190" cy="150" r="2" fill="#FFFFFF" />
+  <circle cx="210" cy="160" r="2" fill="#FFFFFF" />
+  <circle cx="200" cy="140" r="1" fill="#FFFFFF" />
+  <circle cx="185" cy="170" r="1" fill="#FFFFFF" />
+  <circle cx="215" cy="180" r="1" fill="#FFFFFF" />
+  <circle cx="195" cy="190" r="2" fill="#FFFFFF" />
+  
+  <!-- Sparkles -->
+  <path d="M200 140L203 145L208 146L204 150L205 155L200 153L195 155L196 150L192 146L197 145L200 140Z" fill="#FFFFFF" />
+  <path d="M180 170L182 173L185 174L182 176L183 179L180 178L177 179L178 176L175 174L178 173L180 170Z" fill="#FFFFFF" />
+  <path d="M220 180L222 183L225 184L222 186L223 189L220 188L217 189L218 186L215 184L218 183L220 180Z" fill="#FFFFFF" />
+</svg>

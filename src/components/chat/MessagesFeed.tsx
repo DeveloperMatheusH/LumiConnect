@@ -19,8 +19,8 @@ const MessagesFeed: React.FC<MessagesFeedProps> = ({ conversation }) => {
 
   if (!conversation || conversation.messages.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
-        <p className="max-w-xs">
+      <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4 relative z-10">
+        <p className="max-w-xs backdrop-blur-sm bg-background/30 p-4 rounded-lg">
           Nenhuma mensagem ainda. Envie uma mensagem para começar uma conversa.
         </p>
       </div>
@@ -28,7 +28,7 @@ const MessagesFeed: React.FC<MessagesFeedProps> = ({ conversation }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative z-10">
       <div className="text-center mb-2">
         <div className="inline-flex items-center justify-center bg-muted px-3 py-1 rounded-full text-xs text-muted-foreground">
           <PenLine size={12} className="mr-1" />
