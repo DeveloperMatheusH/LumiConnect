@@ -34,21 +34,17 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       lastMessageTime: new Date() 
     };
     
-    // Update contacts state with new contact
     const updatedContacts = [...contacts, newContact];
     setContacts(updatedContacts);
     
-    // Initialize empty conversation for new contact
     const updatedConversations = [
       ...conversations, 
       { contactId: newContact.id, messages: [] }
     ];
     setConversations(updatedConversations);
 
-    // Add introduction message with simplified text
     const introMessage = "Todo o progresso do seu aluno em um só lugar! Aqui você encontrará um panorama completo de atividades que ele realizou, seus interesses e o que ele aprendeu hoje. Acompanhe a evolução e celebre cada aprendizado!";
     
-    // Add message directly to the updated conversations array
     const newMessage: Message = {
       id: uuidv4(),
       contactId: newContact.id,
@@ -58,7 +54,6 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       activityType: 'important'
     };
     
-    // Find the conversation we just added and update it with the intro message
     const convoIndex = updatedConversations.findIndex(
       (convo) => convo.contactId === newContact.id
     );
@@ -73,18 +68,13 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       setConversations(finalConversations);
     }
     
-    // Select the newly created contact
     setSelectedContactId(newContact.id);
     
-    const toastId = toast({
+    toast({
       title: "Contato adicionado",
-      description: `${contact.name} foi adicionado à sua lista de contatos.`
+      description: `${contact.name} foi adicionado à sua lista de contatos.`,
+      duration: 2000,
     });
-    
-    // Auto-dismiss the toast after 3 seconds
-    setTimeout(() => {
-      toast.dismiss(toastId);
-    }, 3000);
   };
 
   const updateContact = (id: string, updatedFields: Partial<Contact>) => {
@@ -94,15 +84,11 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       )
     );
     
-    const toastId = toast({
+    toast({
       title: "Contato atualizado",
-      description: "As informações do contato foram atualizadas."
+      description: "As informações do contato foram atualizadas.",
+      duration: 2000,
     });
-    
-    // Auto-dismiss the toast after 3 seconds
-    setTimeout(() => {
-      toast.dismiss(toastId);
-    }, 3000);
   };
 
   const updateAvatar = (contactId: string, avatarData: string) => {
@@ -114,15 +100,11 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       )
     );
 
-    const toastId = toast({
+    toast({
       title: "Foto atualizada",
-      description: "A foto do perfil foi atualizada com sucesso."
+      description: "A foto do perfil foi atualizada com sucesso.",
+      duration: 2000,
     });
-    
-    // Auto-dismiss the toast after 3 seconds
-    setTimeout(() => {
-      toast.dismiss(toastId);
-    }, 3000);
   };
 
   const deleteContact = (id: string) => {
@@ -136,16 +118,12 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       setSelectedContactId(null);
     }
     
-    const toastId = toast({
+    toast({
       title: "Contato removido",
       description: `${contactToDelete.name} foi removido da sua lista de contatos.`,
-      variant: "destructive"
+      variant: "destructive",
+      duration: 2000,
     });
-    
-    // Auto-dismiss the toast after 3 seconds
-    setTimeout(() => {
-      toast.dismiss(toastId);
-    }, 3000);
   };
 
   const selectContact = (id: string | null) => {
@@ -186,7 +164,6 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    // Update last message time for the contact
     setContacts((prev) =>
       prev.map((contact) =>
         contact.id === contactId
@@ -211,7 +188,6 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       timestamp: new Date()
     };
 
-    // Create a message with the media attachment
     addMessage(
       contactId,
       type === "image" ? "Imagem enviada" : 
@@ -222,22 +198,17 @@ export function ContactsProvider({ children }: { children: React.ReactNode }) {
       activityType
     );
 
-    const toastId = toast({
+    toast({
       title: `${type === "image" ? "Imagem" : type === "video" ? "Vídeo" : "Áudio"} enviado`,
-      description: "Mídia adicionada com sucesso!"
+      description: "Mídia adicionada com sucesso!",
+      duration: 2000,
     });
-    
-    // Auto-dismiss the toast after 3 seconds
-    setTimeout(() => {
-      toast.dismiss(toastId);
-    }, 3000);
   };
 
   const getMediaAttachments = (contactId: string): MediaAttachment[] => {
     const conversation = getConversationByContactId(contactId);
     if (!conversation) return [];
 
-    // Extrair e aplanar todos os anexos de mídia de todas as mensagens
     return conversation.messages
       .filter(message => message.mediaAttachments && message.mediaAttachments.length > 0)
       .flatMap(message => message.mediaAttachments || []);
