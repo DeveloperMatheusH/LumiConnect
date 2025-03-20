@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Paperclip } from 'lucide-react';
+import ActivityIcon from '../ActivityIcon';
 
 interface MessageInputProps {
   onSendMessage: (content: string, activityType: ActivityType) => void;
@@ -38,17 +39,71 @@ const MessageInput: React.FC<MessageInputProps> = ({
               onValueChange={(value) => setSelectedActivityType(value as ActivityType)}
             >
               <SelectTrigger className="w-[180px] h-8">
-                <SelectValue placeholder="Tipo de atividade" />
+                <SelectValue placeholder="Tipo de atividade">
+                  <div className="flex items-center">
+                    <ActivityIcon type={selectedActivityType} className="mr-2" size={16} />
+                    <span>
+                      {selectedActivityType === 'general' ? 'Geral' : 
+                       selectedActivityType === 'therapy' ? 'Terapia' :
+                       selectedActivityType === 'school' ? 'Escola' :
+                       selectedActivityType === 'leisure' ? 'Lazer' :
+                       selectedActivityType === 'meal' ? 'Refeição' :
+                       selectedActivityType === 'progress' ? 'Progresso' :
+                       selectedActivityType === 'challenge' ? 'Desafio' :
+                       'Importante'}
+                    </span>
+                  </div>
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">Geral</SelectItem>
-                <SelectItem value="therapy">Terapia</SelectItem>
-                <SelectItem value="school">Escola</SelectItem>
-                <SelectItem value="leisure">Lazer</SelectItem>
-                <SelectItem value="meal">Refeição</SelectItem>
-                <SelectItem value="progress">Progresso</SelectItem>
-                <SelectItem value="challenge">Desafio</SelectItem>
-                <SelectItem value="important">Importante</SelectItem>
+                <SelectItem value="general">
+                  <div className="flex items-center">
+                    <ActivityIcon type="general" className="mr-2" size={16} />
+                    <span>Geral</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="therapy">
+                  <div className="flex items-center">
+                    <ActivityIcon type="therapy" className="mr-2" size={16} />
+                    <span>Terapia</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="school">
+                  <div className="flex items-center">
+                    <ActivityIcon type="school" className="mr-2" size={16} />
+                    <span>Escola</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="leisure">
+                  <div className="flex items-center">
+                    <ActivityIcon type="leisure" className="mr-2" size={16} />
+                    <span>Lazer</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="meal">
+                  <div className="flex items-center">
+                    <ActivityIcon type="meal" className="mr-2" size={16} />
+                    <span>Refeição</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="progress">
+                  <div className="flex items-center">
+                    <ActivityIcon type="progress" className="mr-2" size={16} />
+                    <span>Progresso</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="challenge">
+                  <div className="flex items-center">
+                    <ActivityIcon type="challenge" className="mr-2" size={16} />
+                    <span>Desafio</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="important">
+                  <div className="flex items-center">
+                    <ActivityIcon type="important" className="mr-2" size={16} />
+                    <span>Importante</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
