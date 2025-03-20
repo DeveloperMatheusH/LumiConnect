@@ -6,11 +6,8 @@ Este projeto surge com o propósito de auxiliar professores, educadores e profis
 
 **URL**: https://lumiconnect.lovable.app/
 
-# Este Projeto foi Utilizado as Seguintes Linguagens:
+# Este Projeto foi Utilizado a Seguinte Linguagem:
 
-- Vite
 - TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+
 
