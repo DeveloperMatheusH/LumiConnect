@@ -10,6 +10,7 @@ import DeleteContactDialog from './contact/DeleteContactDialog';
 import MediaUpload from './MediaUpload';
 import MediaGallery from './MediaGallery';
 import { ActivityType } from '@/types';
+import { ScrollArea } from './ui/scroll-area';
 
 const ConversationView: React.FC = () => {
   const { 
@@ -104,32 +105,36 @@ const ConversationView: React.FC = () => {
         />
       )}
       
-      {showEditForm && (
+      {showEditForm ? (
         <div className="absolute inset-0 z-10 bg-background/95 p-4 animate-fade-in">
-          <AddContactForm 
-            existingContact={selectedContact}
-            onCancel={() => setShowEditForm(false)}
-          />
+          <ScrollArea className="h-full w-full pr-4">
+            <AddContactForm 
+              existingContact={selectedContact}
+              onCancel={() => setShowEditForm(false)}
+            />
+          </ScrollArea>
         </div>
+      ) : (
+        <>
+          <ContactHeader 
+            contact={selectedContact}
+            onInfoClick={() => setShowContactInfo(true)}
+            onEditClick={() => setShowEditForm(true)}
+            onDeleteClick={() => setIsDeleteAlertOpen(true)}
+            onGalleryClick={() => setShowMediaGallery(true)}
+            onAvatarChange={handleAvatarChange}
+          />
+          
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-thin relative z-1">
+            <MessagesFeed conversation={conversation} />
+          </div>
+          
+          <MessageInput 
+            onSendMessage={handleSendMessage}
+            onMediaUploadClick={() => setShowMediaUpload(true)}
+          />
+        </>
       )}
-      
-      <ContactHeader 
-        contact={selectedContact}
-        onInfoClick={() => setShowContactInfo(true)}
-        onEditClick={() => setShowEditForm(true)}
-        onDeleteClick={() => setIsDeleteAlertOpen(true)}
-        onGalleryClick={() => setShowMediaGallery(true)}
-        onAvatarChange={handleAvatarChange}
-      />
-      
-      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin relative z-1">
-        <MessagesFeed conversation={conversation} />
-      </div>
-      
-      <MessageInput 
-        onSendMessage={handleSendMessage}
-        onMediaUploadClick={() => setShowMediaUpload(true)}
-      />
       
       <DeleteContactDialog
         contact={selectedContact}
