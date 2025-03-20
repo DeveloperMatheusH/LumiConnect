@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useContacts } from '@/context/ContactsContext';
@@ -73,13 +74,16 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
     try {
       const fileURL = mediaPreview || '';
       
+      // FIX #1: Ensure the media type is explicitly one of the allowed values
+      const mediaType = mediaFile.type.startsWith('image')
+        ? 'image' as const
+        : mediaFile.type.startsWith('video')
+          ? 'video' as const
+          : 'audio' as const;
+      
       const newMedia = {
         id: uuidv4(),
-        type: mediaFile.type.startsWith('image')
-          ? 'image'
-          : mediaFile.type.startsWith('video')
-            ? 'video'
-            : 'audio',
+        type: mediaType, // Now correctly typed as "image" | "video" | "audio"
         url: fileURL,
         name: mediaFile.name,
         timestamp: new Date(),
@@ -110,7 +114,12 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
           </Button>
         </div>
         
-        <Tabs defaultValue="upload" value={activeTab} onValueChange={setActiveTab}>
+        {/* FIX #2: Use type assertion to match the expected function signature */}
+        <Tabs 
+          defaultValue="upload" 
+          value={activeTab} 
+          onValueChange={(value: "upload" | "record") => setActiveTab(value)}
+        >
           <TabsList className="m-2">
             <TabsTrigger value="upload" className="flex-1">Enviar</TabsTrigger>
             <TabsTrigger value="record" className="flex-1">Gravar</TabsTrigger>
