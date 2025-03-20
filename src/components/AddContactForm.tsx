@@ -286,13 +286,13 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="assistanceLevel">Nível</Label>
+            <Label htmlFor="assistanceLevel">Grau</Label>
             <Select
               value={assistanceLevel}
               onValueChange={handleAssistanceLevelChange}
             >
               <SelectTrigger id="assistanceLevel">
-                <SelectValue placeholder="Selecione o nível" />
+                <SelectValue placeholder="Selecione o grau" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="leve">Leve</SelectItem>
