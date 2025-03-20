@@ -67,12 +67,12 @@ const ConversationView: React.FC = () => {
   
   return (
     <div className="flex-1 flex flex-col h-full animate-fade-in relative">
-      {/* Chat background with lamp and stars at 40% opacity */}
+      {/* Puzzle pieces background at 40% opacity */}
       <div 
         className="absolute inset-0 pointer-events-none z-0 opacity-40 bg-center bg-no-repeat bg-cover"
         style={{ 
           backgroundImage: 'url("/lamp-stars-bg.svg")',
-          backgroundSize: '50%',
+          backgroundSize: '100%',
           backgroundPosition: 'center',
         }}
       />
